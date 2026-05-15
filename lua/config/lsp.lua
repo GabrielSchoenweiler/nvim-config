@@ -79,9 +79,27 @@ vim.api.nvim_create_autocmd("LspAttach", {
 
     -- Set some key bindings conditional on server capabilities
     -- Disable ruff hover feature in favor of Pyright
-    if client.name == "ruff" then
-      client.server_capabilities.hoverProvider = false
-    end
+    -- if client.name == "ruff" then
+    --   client.server_capabilities.hoverProvider = false
+    -- end
+    vim.api.nvim_create_autocmd("LspAttach", {
+      group = vim.api.nvim_create_augroup('lsp_attach_disable_ruff_hover', { clear = true }),
+      callback = function(args)
+        local client = vim.lsp.get_client_by_id(args.data.client_id)
+        if client == nil then
+          return
+        end
+        if client.name == 'ruff' then
+          -- Disable hover in favor of Pyright
+          client.server_capabilities.hoverProvider = false
+        end
+      end,
+      desc = 'LSP: Disable hover capability from Ruff',
+    })
+    -- if client.name == "ruff" then
+    --   client.server_capabilities.hoverProvider = false
+    -- end
+
 
     -- Uncomment code below to enable inlay hint from language server, some LSP server supports inlay hint,
     -- but disable this feature by default, so you may need to enable inlay hint in the LSP server config.
@@ -124,14 +142,14 @@ vim.lsp.config("*", {
 
 -- A mapping from lsp server name to the executable name
 local enabled_lsp_servers = {
-  pyright = "delance-langserver",
-  ruff = "ruff",
-  lua_ls = "lua-language-server",
+  -- pyright = "delance-langserver",
+  -- ruff = "ruff",
+  -- lua_ls = "lua-language-server",
   -- ltex = "ltex-ls",
   -- clangd = "clangd",
-  vimls = "vim-language-server",
-  bashls = "bash-language-server",
-  yamlls = "yaml-language-server",
+  -- vimls = "vim-language-server",
+  -- bashls = "bash-language-server",
+  -- yamlls = "yaml-language-server",
 }
 
 for server_name, lsp_executable in pairs(enabled_lsp_servers) do
